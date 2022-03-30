@@ -11,8 +11,10 @@ const sequelize = new Sequelize({
 
 // Models
 const Post = require("../models/post")(sequelize);
+const User = require("../models/user")(sequelize);
 
 module.exports = {
   sequelize,
-  Post
+  Post,
+  User
 }

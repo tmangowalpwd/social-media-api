@@ -18,6 +18,4 @@ const Post = (sequelize) => {
   )
 }
 
-
-
 module.exports = Post;

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 
 const Post = (sequelize) => {
-  sequelize.define(
+  return sequelize.define(
     "Post",
     {
       image_url: {
@@ -9,6 +9,9 @@ const Post = (sequelize) => {
         allowNull: false
       },
       caption: {
+        type: DataTypes.STRING
+      },
+      location: {
         type: DataTypes.STRING
       }
     }

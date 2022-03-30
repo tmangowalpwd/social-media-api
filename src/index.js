@@ -18,6 +18,10 @@ app.get("/", (req, res) => {
   res.send("<h1>Pict perfect API</h1>")
 })
 
+const { postRoutes } = require("./routes")
+
+app.use("/posts", postRoutes)
+
 app.listen(PORT, () => {
   console.log("Listening in port", PORT)
 })

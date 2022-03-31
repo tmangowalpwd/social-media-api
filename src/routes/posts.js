@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const { Post } = require("../lib/sequelize")
+const { Post, User, Like } = require("../lib/sequelize")
 const { Op } = require("sequelize")
 
 router.get("/", async (req, res) => {
@@ -14,7 +14,18 @@ router.get("/", async (req, res) => {
         ...req.query
       },
       limit: _limit ? parseInt(_limit) : undefined,
-      offset: (_page - 1) * _limit
+      offset: (_page - 1) * _limit,
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ["password"]
+          }
+        }
+      ],
+      // attributes: {
+      //   include: ["location", "caption"]
+      // }
     })
 
     return res.status(200).json({
@@ -93,6 +104,28 @@ router.delete("/:id", async (req, res) => {
       result: deletedPost
     })
   } catch (error) {
+    console.log(err)
+    return res.status(500).json({
+      message: "Server error"
+    })
+  }
+})
+
+router.get("/:id/likes", async (req, res) => {
+  try {
+    const { id } = req.params
+    const postLikes = await Like.findAll({
+      where: {
+        PostId: id
+      },
+      include: User
+    })
+
+    return res.status(200).json({
+      message: "Fetch likes",
+      result: postLikes
+    })
+  } catch (err) {
     console.log(err)
     return res.status(500).json({
       message: "Server error"

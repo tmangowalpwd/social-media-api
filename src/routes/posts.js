@@ -23,9 +23,6 @@ router.get("/", async (req, res) => {
           }
         }
       ],
-      // attributes: {
-      //   include: ["location", "caption"]
-      // }
     })
 
     return res.status(200).json({

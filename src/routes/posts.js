@@ -130,4 +130,10 @@ router.get("/:id/likes", async (req, res) => {
   }
 })
 
+router.post("/:postId/likes/:userId", async () => {
+  // 1. Check apakah user sudah like post?
+  // 2. Tambah relasi user dengan post di table like
+  // 3. Increment like count di post
+})
+
 module.exports = router

@@ -84,6 +84,12 @@ const authControllers = {
         message: "Server error"
       })
     }
+  },
+  keepLogin: async (req, res) => {
+    // Terima token
+    // Check kalau token valid
+    // Renew token
+    // Kirim token + user data
   }
 }
 

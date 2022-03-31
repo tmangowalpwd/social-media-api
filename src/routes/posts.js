@@ -18,11 +18,20 @@ router.get("/", async (req, res) => {
       include: [
         {
           model: User,
-          attributes: {
-            exclude: ["password"]
-          }
+          attributes: ["username"]
+        },
+        {
+          // Get users who liked the posts
+          // Use nested many-to-many because if we 
+          // include the User model directly, the 1-to-many
+          // relationship is going to be selected instead (user_id in Post)
+          model: Like,
+          include: User
         }
       ],
+      // To prevent wrong row count when
+      // querying/including many-to-many data
+      distinct: true
     })
 
     return res.status(200).json({
@@ -130,10 +139,48 @@ router.get("/:id/likes", async (req, res) => {
   }
 })
 
-router.post("/:postId/likes/:userId", async () => {
+router.post("/:postId/likes/:userId", async (req, res) => {
   // 1. Check apakah user sudah like post?
   // 2. Tambah relasi user dengan post di table like
   // 3. Increment like count di post
+  try {
+    const { postId, userId } = req.params
+
+    const [newPost, didCreatePost] = await Like.findOrCreate({
+      where: {
+        post_id: postId,
+        user_id: userId
+      },
+      defaults: {
+        ...req.body
+      }
+    })
+
+    if (!didCreatePost) {
+      return res.status(400).json({
+        message: "User already liked post"
+      })
+    }
+
+    await Post.increment(
+      { like_count: 1 },
+      {
+        where: {
+          id: postId
+        }
+      }
+    );
+
+    return res.status(200).json({
+      message: "Liked post"
+    })
+
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      message: "Server error"
+    })
+  }
 })
 
 module.exports = router

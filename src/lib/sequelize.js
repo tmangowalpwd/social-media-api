@@ -24,8 +24,8 @@ Post.belongsTo(User, { foreignKey: "user_id" })
 User.hasMany(Post, { foreignKey: "user_id" })
 
 // M : M
-// Post.belongsToMany(User, { through: Like })
-// User.belongsToMany(Post, { through: Like })
+Post.belongsToMany(User, { through: Like, foreignKey: "post_id" })
+User.belongsToMany(Post, { through: Like, foreignKey: "user_id" })
 User.hasMany(Like, { foreignKey: "user_id" })
 Like.belongsTo(User, { foreignKey: "user_id" })
 Post.hasMany(Like, { foreignKey: "post_id" })

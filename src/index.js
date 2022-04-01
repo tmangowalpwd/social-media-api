@@ -20,6 +20,9 @@ app.get("/", (req, res) => {
 
 const { postRoutes, authRoutes } = require("./routes")
 
+app.use("/post_images", express.static(`${__dirname}/public/posts`))
+app.use("/profile_pictures", express.static(`${__dirname}/public/profile_pictures`))
+
 app.use("/posts", postRoutes)
 app.use("/auth", authRoutes)
 

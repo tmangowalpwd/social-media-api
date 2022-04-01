@@ -11,6 +11,7 @@ const sequelize = new Sequelize({
   //   console.log("SQL AKUUU", sql)
   //   fs.appendFileSync(__dirname + "/sql_logs.txt", sql)
   // }
+  logging: false
 })
 
 // Models

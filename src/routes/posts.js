@@ -2,6 +2,7 @@ const router = require("express").Router()
 const { Post, User, Like } = require("../lib/sequelize")
 const { Op } = require("sequelize")
 const fileUploader = require("../lib/uploader")
+const fs = require("fs")
 
 router.get("/", async (req, res) => {
   try {
@@ -76,6 +77,7 @@ router.post("/",
       })
     } catch (err) {
       console.log(err)
+      fs.unlinkSync(__dirname + "/../public/posts/" + req.file.filename)
       return res.status(500).json({
         message: "Server error"
       })

@@ -7,9 +7,17 @@ const authorizedLoggedInUser = (req, res, next) => {
     const verifiedToken = verifyToken(token)
     req.token = verifiedToken
 
+    console.log(req.token)
+
     next()
   } catch (err) {
     console.log(err)
+    if (err.message === "jwt expired") {
+      return res.status(419).json({
+        message: "token expired"
+      })
+    }
+
     return res.status(401).json({
       message: err.message
     })

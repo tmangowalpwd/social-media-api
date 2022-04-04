@@ -61,7 +61,7 @@ router.post("/",
     .single("post_image_file"),
   async (req, res) => {
     try {
-      const { caption, location, user_id } = req.body;
+      const { caption, location } = req.body;
 
       const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN
       const filePath = "post_images"
@@ -71,7 +71,7 @@ router.post("/",
         image_url: `${uploadFileDomain}/${filePath}/${filename}`,
         caption,
         location,
-        user_id
+        user_id: req.token.id
       })
 
       return res.status(201).json({
@@ -97,7 +97,8 @@ router.patch("/:id", authorizedLoggedInUser, async (req, res) => {
       },
       {
         where: {
-          id
+          id,
+          user_id: req.token.id
         }
       }
     )

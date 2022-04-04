@@ -31,7 +31,7 @@ const authControllers = {
         username,
         email,
         full_name,
-        password: hashedPassword
+        password: hashedPassword,
       })
 
       return res.status(201).json({
@@ -71,7 +71,12 @@ const authControllers = {
 
       delete findUser.dataValues.password
 
-      const token = generateToken({ id: findUser.id })
+      const token = generateToken(
+        {
+          id: findUser.id,
+          role: findUser.role
+        }
+      )
 
       return res.status(200).json({
         message: "Logged in user",

@@ -1,55 +1,57 @@
 const router = require("express").Router()
 const { Post, User, Like } = require("../lib/sequelize")
-const { Op } = require("sequelize")
 const fileUploader = require("../lib/uploader")
 const fs = require("fs")
-const { authorizedLoggedInUser } = require("../middlewares/authMiddleware")
+const { authorizedLoggedInUser, authorizeUserWithRole } = require("../middlewares/authMiddleware")
 
-router.get("/", authorizedLoggedInUser, async (req, res) => {
-  try {
-    const { _limit = 30, _page = 1 } = req.query
+router.get("/",
+  authorizedLoggedInUser,
+  authorizeUserWithRole(["admin"]),
+  async (req, res) => {
+    try {
+      const { _limit = 30, _page = 1 } = req.query
 
-    delete req.query._limit
-    delete req.query._page
+      delete req.query._limit
+      delete req.query._page
 
-    const findPosts = await Post.findAndCountAll({
-      where: {
-        ...req.query
-      },
-      limit: _limit ? parseInt(_limit) : undefined,
-      offset: (_page - 1) * _limit,
-      // include: User
-      include: [
-        {
-          // Find post owner
-          model: User,
-          attributes: ["username"]
+      const findPosts = await Post.findAndCountAll({
+        where: {
+          ...req.query
         },
-        {
-          // Get users who liked the posts
-          // Use nested many-to-many because if we 
-          // include the User model directly, the 1-to-many
-          // relationship is going to be selected instead (user_id in Post)
-          model: Like,
-          include: User
-        }
-      ],
-      // To prevent wrong row count when
-      // querying/including many-to-many data
-      distinct: true
-    })
+        limit: _limit ? parseInt(_limit) : undefined,
+        offset: (_page - 1) * _limit,
+        // include: User
+        include: [
+          {
+            // Find post owner
+            model: User,
+            attributes: ["username"]
+          },
+          {
+            // Get users who liked the posts
+            // Use nested many-to-many because if we 
+            // include the User model directly, the 1-to-many
+            // relationship is going to be selected instead (user_id in Post)
+            model: Like,
+            include: User
+          }
+        ],
+        // To prevent wrong row count when
+        // querying/including many-to-many data
+        distinct: true
+      })
 
-    return res.status(200).json({
-      message: "Find posts",
-      result: findPosts
-    })
-  } catch (err) {
-    console.log(err)
-    return res.status(500).json({
-      message: "Server error"
-    })
-  }
-})
+      return res.status(200).json({
+        message: "Find posts",
+        result: findPosts
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+  })
 
 router.post("/",
   authorizedLoggedInUser,

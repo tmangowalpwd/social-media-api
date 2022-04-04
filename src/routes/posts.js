@@ -3,8 +3,9 @@ const { Post, User, Like } = require("../lib/sequelize")
 const { Op } = require("sequelize")
 const fileUploader = require("../lib/uploader")
 const fs = require("fs")
+const { authorizedLoggedInUser } = require("../middlewares/authMiddleware")
 
-router.get("/", async (req, res) => {
+router.get("/", authorizedLoggedInUser, async (req, res) => {
   try {
     const { _limit = 30, _page = 1 } = req.query
 
@@ -17,24 +18,25 @@ router.get("/", async (req, res) => {
       },
       limit: _limit ? parseInt(_limit) : undefined,
       offset: (_page - 1) * _limit,
-      include: User
-      // include: [
-      //   {
-      //     model: User,
-      //     attributes: ["username"]
-      //   },
-      // {
-      // Get users who liked the posts
-      // Use nested many-to-many because if we 
-      // include the User model directly, the 1-to-many
-      // relationship is going to be selected instead (user_id in Post)
-      // model: Like,
       // include: User
-      // }
-      // ],
+      include: [
+        {
+          // Find post owner
+          model: User,
+          attributes: ["username"]
+        },
+        {
+          // Get users who liked the posts
+          // Use nested many-to-many because if we 
+          // include the User model directly, the 1-to-many
+          // relationship is going to be selected instead (user_id in Post)
+          model: Like,
+          include: User
+        }
+      ],
       // To prevent wrong row count when
       // querying/including many-to-many data
-      // distinct: true
+      distinct: true
     })
 
     return res.status(200).json({
@@ -50,6 +52,7 @@ router.get("/", async (req, res) => {
 })
 
 router.post("/",
+  authorizedLoggedInUser,
   fileUploader({
     destinationFolder: "posts",
     fileType: "image",
@@ -84,7 +87,7 @@ router.post("/",
     }
   })
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authorizedLoggedInUser, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -111,7 +114,7 @@ router.patch("/:id", async (req, res) => {
   }
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authorizedLoggedInUser, async (req, res) => {
   try {
     const { id } = req.params;
 

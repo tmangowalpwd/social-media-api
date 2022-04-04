@@ -9,10 +9,12 @@ router.get("/",
   authorizeUserWithRole(["admin"]),
   async (req, res) => {
     try {
-      const { _limit = 30, _page = 1 } = req.query
+      const { _limit = 30, _page = 1, _sortBy = "", _sortDir = "" } = req.query
 
       delete req.query._limit
       delete req.query._page
+      delete req.query._sortBy
+      delete req.query._sortDir
 
       const findPosts = await Post.findAndCountAll({
         where: {
@@ -38,7 +40,8 @@ router.get("/",
         ],
         // To prevent wrong row count when
         // querying/including many-to-many data
-        distinct: true
+        distinct: true,
+        order: _sortBy ? [[_sortBy, _sortDir]] : undefined
       })
 
       return res.status(200).json({

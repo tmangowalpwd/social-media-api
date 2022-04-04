@@ -1,6 +1,4 @@
 const { verifyToken } = require("../lib/jwt")
-const fs = require("fs")
-const moment = require("moment")
 
 const authorizedLoggedInUser = (req, res, next) => {
   try {

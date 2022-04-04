@@ -93,6 +93,28 @@ const authControllers = {
     // Check kalau token valid
     // Renew token
     // Kirim token + user data
+    try {
+      const { token } = req;
+
+      const renewedToken = generateToken({ id: token.id })
+
+      const findUser = await User.findByPk(token.id)
+
+      delete findUser.dataValues.password
+
+      return res.status(200).json({
+        message: "Renewed user token",
+        result: {
+          user: findUser,
+          token: renewedToken
+        }
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
   }
 }
 

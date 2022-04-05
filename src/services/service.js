@@ -1,25 +1,26 @@
 class Service {
-  static handleServerError = (res, err) => {
-    console.log(err)
-    res.status(500).json({
-      message: "Server error"
-    })
-  }
-
-  static handleClientError = (res, err = {
-    statusCode: 400,
-    message: "Client error"
+  static handleError = ({
+    message = "Server error",
+    statusCode = 500
   }) => {
-    res.status(err.statusCode || 400).json({
-      message: err.message
-    })
+    return {
+      success: false,
+      message,
+      statusCode
+    }
   }
 
-  static handleSuccess = (res, result) => {
-    res.status(result.statusCode || 200).json({
-      message: result.message,
-      result: result.data
-    })
+  static handleSuccess = ({
+    data = undefined,
+    message = "Request success",
+    statusCode = 200
+  }) => {
+    return {
+      success: true,
+      data,
+      message,
+      statusCode
+    }
   }
 }
 

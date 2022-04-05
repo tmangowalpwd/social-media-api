@@ -3,6 +3,7 @@ const Service = require("../service");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 const { generateToken } = require("../../lib/jwt");
+const UserService = require("../user");
 
 class AuthService extends Service {
   static loginUser = async (req, res) => {
@@ -49,6 +50,13 @@ class AuthService extends Service {
     } catch (err) {
       return this.handleServerError(res, err)
     }
+  }
+
+  static registerUser = async (req, res) => {
+    // Kirim email
+    // Kirim SMS
+
+    await UserService.createNewUser();
   }
 }
 

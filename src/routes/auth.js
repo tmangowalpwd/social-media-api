@@ -1,9 +1,10 @@
 const authControllers = require("../controllers/auth");
 const { authorizedLoggedInUser } = require("../middlewares/authMiddleware");
+const AuthService = require("../services/auth");
 
 const router = require("express").Router();
 
-router.post("/login", authControllers.loginUser)
+router.post("/login", AuthService.loginUser)
 router.post("/register", authControllers.registerUser)
 
 router.get("/refresh-token", authorizedLoggedInUser, authControllers.keepLogin)

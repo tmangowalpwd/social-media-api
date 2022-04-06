@@ -50,7 +50,8 @@ const authControllers = {
 
       const renderedTemplate = mustache.render(template, {
         username,
-        verify_url: verificationLink
+        verify_url: verificationLink,
+        full_name
       })
 
       await mailer({

@@ -3,6 +3,8 @@ const { User } = require("../lib/sequelize")
 const bcrypt = require("bcrypt");
 const { generateToken, verifyToken } = require("../lib/jwt");
 const mailer = require("../lib/mailer");
+const mustache = require("mustache");
+const fs = require("fs");
 
 const authControllers = {
   registerUser: async (req, res) => {
@@ -44,12 +46,17 @@ const authControllers = {
       const verificationLink =
         `http://localhost:2020/auth/verify/${verificationToken}`
 
+      const template = fs.readFileSync(__dirname + "/../templates/verify.html").toString()
+
+      const renderedTemplate = mustache.render(template, {
+        username,
+        verify_url: verificationLink
+      })
+
       await mailer({
         to: email,
         subject: "Verify your account!",
-        html:
-          `Your account has been registered, 
-        please verify it by clicking this <a href="${verificationLink}">link</a>`
+        html: renderedTemplate
       })
 
       return res.status(201).json({
@@ -174,6 +181,43 @@ const authControllers = {
         message: "Server error"
       })
     }
+  },
+  resendVerificationEmail: async (req, res) => {
+    try {
+      const userId = req.token.id
+
+      const findUser = await User.findByPk(userId)
+
+      if (findUser.is_verified) {
+        return res.status(400).json({
+          message: "User is already verified"
+        })
+      }
+
+      const verificationToken = generateToken({
+        id: userId,
+        isEmailVerification: true
+      }, "1h")
+
+      const verificationLink =
+        `http://localhost:2020/auth/verify/${verificationToken}`
+
+      await mailer({
+        to: findUser.email,
+        subject: "Verify your account!",
+        html: `Click <a href="${verificationLink}">here</a> to verify your account`
+      })
+
+      return res.status(200).json({
+        message: "Email sent"
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+
   }
 }
 

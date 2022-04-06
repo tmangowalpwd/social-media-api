@@ -2,6 +2,7 @@ const { Op } = require("sequelize")
 const { User } = require("../lib/sequelize")
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../lib/jwt");
+const mailer = require("../lib/mailer");
 
 const authControllers = {
   registerUser: async (req, res) => {
@@ -32,6 +33,14 @@ const authControllers = {
         email,
         full_name,
         password: hashedPassword,
+      })
+
+      await mailer({
+        to: email,
+        subject: "Verify your account!",
+        html:
+          `Your account has been registered, 
+        please verify it by clicking this <a href="#">link</a>`
       })
 
       return res.status(201).json({
@@ -78,6 +87,12 @@ const authControllers = {
         }
       )
 
+      // await mailer({
+      //   to: findUser.email,
+      //   subject: "Logged in account",
+      //   text: "An account using your email has logged in"
+      // })
+
       return res.status(200).json({
         message: "Logged in user",
         result: {
@@ -120,7 +135,8 @@ const authControllers = {
         message: "Server error"
       })
     }
-  }
+  },
+  verifyUser: async (req, res) => { }
 }
 
 module.exports = authControllers

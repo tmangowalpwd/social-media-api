@@ -51,6 +51,24 @@ class DAO {
       return err
     }
   }
+
+  createUniqueData = async (body, field = "username") => {
+    try {
+      // this.model = User
+      const { username, email, password } = body;
+      const createData = await this.model.findOne({
+        where: {
+          username: body.username
+        }
+      })
+
+      // if ada -> error
+
+      await this.model.create(body)
+    } catch (err) {
+
+    }
+  }
 }
 
 module.exports = DAO

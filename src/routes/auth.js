@@ -8,4 +8,6 @@ router.post("/register", authControllers.registerUser)
 
 router.get("/refresh-token", authorizedLoggedInUser, authControllers.keepLogin)
 
+router.get("/verify/:token", authControllers.verifyUser)
+
 module.exports = router;

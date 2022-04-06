@@ -8,9 +8,13 @@ const VerificationToken = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false
       },
-      validUntil: {
+      valid_until: {
         type: DataTypes.DATE,
         allowNull: false
+      },
+      is_valid: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       },
     }
   )

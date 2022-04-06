@@ -19,6 +19,7 @@ const Post = require("../models/post")(sequelize);
 const User = require("../models/user")(sequelize);
 const Like = require("../models/like")(sequelize);
 const VerificationToken = require("../models/verification_token")(sequelize)
+const ForgotPasswordToken = require("../models/forgot_password_token")(sequelize)
 
 // Associations
 // 1 : M
@@ -36,10 +37,14 @@ Like.belongsTo(Post, { foreignKey: "post_id" })
 VerificationToken.belongsTo(User, { foreignKey: "user_id" })
 User.hasMany(VerificationToken, { foreignKey: "user_id" })
 
+ForgotPasswordToken.belongsTo(User, { foreignKey: "user_id" })
+User.hasMany(ForgotPasswordToken, { foreignKey: "user_id" })
+
 module.exports = {
   sequelize,
   Post,
   User,
   Like,
-  VerificationToken
+  VerificationToken,
+  ForgotPasswordToken
 }

@@ -11,8 +11,11 @@ const mailer = async ({
     auth: {
       user: process.env.NODEMAILER_USER,
       pass: process.env.NODEMAILER_PASS
+      // user: testAccount.user,
+      // pass: testAccount.pass
     },
     host: "smtp.gmail.com",
+    // host: "smtp.etheral.email",
   })
 
   await transport.sendMail({

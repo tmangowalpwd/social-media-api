@@ -163,9 +163,11 @@ const authControllers = {
         }
       })
 
-      return res.status(200).json({
-        message: "User verified!"
-      })
+      // return res.status(200).json({
+      //   message: "User verified!"
+      // })
+
+      return res.redirect(`http://localhost:3000/verification-success?referral=${token}`)
     } catch (err) {
       console.log(err)
       return res.status(500).json({

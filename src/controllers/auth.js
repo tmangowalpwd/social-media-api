@@ -326,6 +326,55 @@ const authControllers = {
         message: "Server error"
       })
     }
+  },
+  resendVerificationEmailV2: async (req, res) => {
+    try {
+      const { id } = req.token // JWT
+
+      await VerificationToken.update({ is_valid: false }, {
+        where: {
+          is_valid: true,
+          user_id: id
+        }
+      })
+
+      const verificationToken = nanoid(40);
+
+      await VerificationToken.create({
+        token: verificationToken,
+        is_valid: true,
+        user_id: id,
+        valid_until: moment().add(1, "hour")
+      })
+
+      const findUser = await User.findByPk(id)
+
+      const verificationLink =
+        `http://localhost:2020/auth/v2/verify/${verificationToken}`
+
+      const template = fs.readFileSync(__dirname + "/../templates/verify.html").toString()
+
+      const renderedTemplate = mustache.render(template, {
+        username: findUser.username,
+        verify_url: verificationLink,
+        full_name: findUser.full_name
+      })
+
+      await mailer({
+        to: findUser.email,
+        subject: "Verify your account!",
+        html: renderedTemplate
+      })
+
+      return res.status(201).json({
+        message: "Resent verification email"
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
   }
 }
 

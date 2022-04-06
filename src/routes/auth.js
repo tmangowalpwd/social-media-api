@@ -19,6 +19,11 @@ router.post(
 // Verifikasi cara store token di database
 router.post("/v2/register", authControllers.registerUserV2)
 router.get("/v2/verify/:token", authControllers.verifyUserV2)
+router.post(
+  "/v2/resend-verification",
+  authorizedLoggedInUser,
+  authControllers.resendVerificationEmailV2
+)
 
 // fitur resend verif email
 // 1. generate token baru sesuai dengan ID user yang kirim request

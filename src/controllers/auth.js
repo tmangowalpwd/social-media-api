@@ -1,7 +1,7 @@
 const { Op } = require("sequelize")
 const { User } = require("../lib/sequelize")
 const bcrypt = require("bcrypt");
-const { generateToken } = require("../lib/jwt");
+const { generateToken, verifyToken } = require("../lib/jwt");
 const mailer = require("../lib/mailer");
 
 const authControllers = {
@@ -28,19 +28,28 @@ const authControllers = {
 
       const hashedPassword = bcrypt.hashSync(password, 5)
 
-      await User.create({
+      const newUser = await User.create({
         username,
         email,
         full_name,
         password: hashedPassword,
       })
 
+      // Verification email
+      const verificationToken = generateToken({
+        id: newUser.id,
+        isEmailVerification: true
+      }, "1h")
+
+      const verificationLink =
+        `http://localhost:2020/auth/verify/${verificationToken}`
+
       await mailer({
         to: email,
         subject: "Verify your account!",
         html:
           `Your account has been registered, 
-        please verify it by clicking this <a href="#">link</a>`
+        please verify it by clicking this <a href="${verificationLink}">link</a>`
       })
 
       return res.status(201).json({
@@ -136,7 +145,34 @@ const authControllers = {
       })
     }
   },
-  verifyUser: async (req, res) => { }
+  verifyUser: async (req, res) => {
+    try {
+      const { token } = req.params
+
+      const isTokenVerified = verifyToken(token)
+
+      if (!isTokenVerified || !isTokenVerified.isEmailVerification) {
+        return res.status(400).json({
+          message: "Token invalid!"
+        })
+      }
+
+      await User.update({ is_verified: true }, {
+        where: {
+          id: isTokenVerified.id
+        }
+      })
+
+      return res.status(200).json({
+        message: "User verified!"
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+  }
 }
 
 module.exports = authControllers

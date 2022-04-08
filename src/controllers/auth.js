@@ -589,6 +589,18 @@ const authControllers = {
 
       const otpToken = nanoid(6);
 
+      await OTP.update(
+        {
+          is_valid: false,
+        },
+        {
+          where: {
+            user_id: findUser.id,
+            is_valid: true
+          }
+        }
+      )
+
       await OTP.create({
         token: otpToken,
         user_id: findUser.id,

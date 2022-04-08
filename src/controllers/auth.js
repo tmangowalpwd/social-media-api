@@ -634,6 +634,73 @@ const authControllers = {
         message: "Server error"
       })
     }
+  },
+  otpLoginUser: async (req, res) => {
+    try {
+      const { otpToken, userId } = req.params
+
+      const findOTP = await OTP.findOne({
+        where: {
+          token: otpToken,
+          user_id: userId,
+          is_valid: true,
+          valid_until: {
+            [Op.gt]: moment().utc()
+          }
+        },
+      })
+
+      if (!findOTP) {
+        return res.status(400).json({
+          message: "OTP Invalid"
+        })
+      }
+
+      // Invalidate all previous sessions
+      await Session.update(
+        {
+          is_valid: false
+        },
+        {
+          where: {
+            user_id: findOTP.user_id,
+            is_valid: true
+          }
+        }
+      )
+
+      const sessionToken = nanoid(64);
+
+      // Create new session for logged in user
+      await Session.create({
+        user_id: findOTP.user_id,
+        is_valid: true,
+        token: sessionToken,
+        valid_until: moment().add(1, "day")
+      })
+
+      await OTP.update(
+        {
+          is_valid: false
+        },
+        {
+          where: {
+            user_id: findOTP.user_id,
+            is_valid: true,
+            id: findOTP.id
+          }
+        }
+      )
+      // findOTP.is_valid = false
+      // findOTP.save()
+
+      return res.redirect(`http://localhost:3000/auth/magic?session=${sessionToken}`)
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
   }
 }
 

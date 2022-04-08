@@ -32,5 +32,6 @@ router.post("/session/login", authControllers.sessionLoginUser)
 router.get("/session/refresh-token", sessionAuthorizeLoggedInUser, authControllers.sessionKeepLogin)
 
 router.post("/otp/request", authControllers.sendOTP)
+router.get("/otp/login/:otpToken/:userId", authControllers.otpLoginUser)
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const { verifyToken } = require("../lib/jwt")
+const { verifySession } = require("../lib/session")
 
 const authorizedLoggedInUser = (req, res, next) => {
   try {
@@ -19,6 +20,27 @@ const authorizedLoggedInUser = (req, res, next) => {
     }
 
     return res.status(401).json({
+      message: err.message
+    })
+  }
+}
+
+const sessionAuthorizeLoggedInUser = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization
+
+    const verifiedToken = await verifySession(token)
+
+    if (!verifiedToken) throw new Error("Session invalid/expired")
+
+    req.token = verifiedToken.dataValues
+
+    console.log(req.token)
+
+    next()
+  } catch (err) {
+    console.log(err)
+    return res.status(419).json({
       message: err.message
     })
   }
@@ -52,5 +74,6 @@ const authorizeUserWithRole = (roles = []) => {
 
 module.exports = {
   authorizedLoggedInUser,
-  authorizeUserWithRole
+  authorizeUserWithRole,
+  sessionAuthorizeLoggedInUser,
 }

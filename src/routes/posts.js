@@ -2,11 +2,10 @@ const router = require("express").Router()
 const { Post, User, Like } = require("../lib/sequelize")
 const fileUploader = require("../lib/uploader")
 const fs = require("fs")
-const { authorizedLoggedInUser, authorizeUserWithRole } = require("../middlewares/authMiddleware")
+const { authorizedLoggedInUser, authorizeUserWithRole, sessionAuthorizeLoggedInUser } = require("../middlewares/authMiddleware")
 
 router.get("/",
-  authorizedLoggedInUser,
-  authorizeUserWithRole(["admin"]),
+  sessionAuthorizeLoggedInUser,
   async (req, res) => {
     try {
       const { _limit = 30, _page = 1, _sortBy = "", _sortDir = "" } = req.query
@@ -27,15 +26,16 @@ router.get("/",
           {
             // Find post owner
             model: User,
-            attributes: ["username"]
+            attributes: ["username"],
+            as: "user_post"
           },
           {
             // Get users who liked the posts
             // Use nested many-to-many because if we 
             // include the User model directly, the 1-to-many
             // relationship is going to be selected instead (user_id in Post)
-            model: Like,
-            include: User
+            model: User,
+            as: "user_likes"
           }
         ],
         // To prevent wrong row count when

@@ -517,6 +517,9 @@ const authControllers = {
         valid_until: moment().add(1, "day")
       })
 
+      findUser.last_login = moment()
+      findUser.save()
+
       return res.status(200).json({
         message: "Logged in user",
         result: {

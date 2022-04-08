@@ -535,7 +535,42 @@ const authControllers = {
       })
     }
   },
-  sessionKeepLogin: async () => { }
+  sessionKeepLogin: async (req, res) => {
+    try {
+      const { token } = req;
+
+      const renewedToken = nanoid(64);
+
+      const findUser = await User.findByPk(token.user_id)
+
+      delete findUser.dataValues.password
+
+      await Session.update(
+        {
+          token: renewedToken,
+          valid_until: moment().add(1, "day")
+        },
+        {
+          where: {
+            id: token.id
+          }
+        }
+      )
+
+      return res.status(200).json({
+        message: "Renewed user token",
+        result: {
+          user: findUser,
+          token: renewedToken
+        }
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+  }
 }
 
 module.exports = authControllers

@@ -1,5 +1,5 @@
 const authControllers = require("../controllers/auth");
-const { authorizedLoggedInUser } = require("../middlewares/authMiddleware");
+const { authorizedLoggedInUser, sessionAuthorizeLoggedInUser } = require("../middlewares/authMiddleware");
 
 const router = require("express").Router();
 
@@ -29,6 +29,6 @@ router.post("/forgot-password-email", authControllers.sendForgotPasswordEmail)
 router.patch("/change-password-forgot", authControllers.changeUserForgotPassword)
 
 router.post("/session/login", authControllers.sessionLoginUser)
-
+router.get("/session/refresh-token", sessionAuthorizeLoggedInUser, authControllers.sessionKeepLogin)
 
 module.exports = router;

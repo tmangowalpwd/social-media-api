@@ -1,5 +1,5 @@
 const { Op } = require("sequelize")
-const { User, VerificationToken, ForgotPasswordToken } = require("../lib/sequelize")
+const { User, VerificationToken, ForgotPasswordToken, Session } = require("../lib/sequelize")
 const bcrypt = require("bcrypt");
 const { generateToken, verifyToken } = require("../lib/jwt");
 const mailer = require("../lib/mailer");
@@ -467,7 +467,72 @@ const authControllers = {
         message: "Server error"
       })
     }
-  }
+  },
+  sessionLoginUser: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      const findUser = await User.findOne({
+        where: {
+          username
+        }
+      });
+
+      if (!findUser) {
+        return res.status(400).json({
+          message: "Wrong username or password"
+        })
+      }
+
+      const isPasswordCorrect = bcrypt.compareSync(password, findUser.password)
+
+      if (!isPasswordCorrect) {
+        return res.status(400).json({
+          message: "Wrong username or password"
+        })
+      }
+
+      delete findUser.dataValues.password
+
+      // Invalidate all previous sessions
+      await Session.update(
+        {
+          is_valid: false
+        },
+        {
+          where: {
+            user_id: findUser.id,
+            is_valid: true
+          }
+        }
+      )
+
+      const sessionToken = nanoid(64);
+
+      // Create new session for logged in user
+      await Session.create({
+        user_id: findUser.id,
+        is_valid: true,
+        token: sessionToken,
+        valid_until: moment().add(1, "day")
+      })
+
+      return res.status(200).json({
+        message: "Logged in user",
+        result: {
+          user: findUser,
+          token: sessionToken
+        }
+      })
+
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+  },
+  sessionKeepLogin: async () => { }
 }
 
 module.exports = authControllers

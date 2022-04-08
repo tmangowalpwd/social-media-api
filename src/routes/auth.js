@@ -28,8 +28,6 @@ router.post(
 router.post("/forgot-password-email", authControllers.sendForgotPasswordEmail)
 router.patch("/change-password-forgot", authControllers.changeUserForgotPassword)
 
-// fitur resend verif email
-// 1. generate token baru sesuai dengan ID user yang kirim request
-// 2. invalidate token2 yang lama
+router.post("/session/login", authControllers.sessionLoginUser)
 
 module.exports = router;

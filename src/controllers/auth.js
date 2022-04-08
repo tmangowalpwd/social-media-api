@@ -1,5 +1,5 @@
 const { Op } = require("sequelize")
-const { User, VerificationToken, ForgotPasswordToken, Session } = require("../lib/sequelize")
+const { User, VerificationToken, ForgotPasswordToken, Session, OTP } = require("../lib/sequelize")
 const bcrypt = require("bcrypt");
 const { generateToken, verifyToken } = require("../lib/jwt");
 const mailer = require("../lib/mailer");
@@ -563,6 +563,58 @@ const authControllers = {
           user: findUser,
           token: renewedToken
         }
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Server error"
+      })
+    }
+  },
+  sendOTP: async (req, res) => {
+    try {
+      const { username } = req.body
+
+      const findUser = await User.findOne({
+        where: {
+          username
+        }
+      })
+
+      if (!findUser) {
+        return res.status(400).json({
+          message: "No user found"
+        })
+      }
+
+      const otpToken = nanoid(6);
+
+      await OTP.create({
+        token: otpToken,
+        user_id: findUser.id,
+        valid_until: moment().add(1, "hour"),
+        is_valid: true
+      })
+
+      const magicLink =
+        `http://localhost:2020/auth/otp/login/${otpToken}/${findUser.id}`
+
+      const template = fs.readFileSync(__dirname + "/../templates/otp.html").toString()
+
+      const renderedTemplate = mustache.render(template, {
+        username: findUser.username,
+        magicLink,
+        full_name: findUser.full_name
+      })
+
+      await mailer({
+        subject: "Log in to pict perfect",
+        to: findUser.email,
+        html: renderedTemplate
+      })
+
+      return res.status(200).json({
+        message: "OTP sent to email"
       })
     } catch (err) {
       console.log(err)

@@ -21,6 +21,7 @@ const Like = require("../models/like")(sequelize);
 const VerificationToken = require("../models/verification_token")(sequelize);
 const ForgotPasswordToken = require("../models/forgot_password_token")(sequelize);
 const Session = require("../models/session")(sequelize);
+const OTP = require("../models/otp")(sequelize);
 
 // Associations
 // 1 : M
@@ -44,6 +45,9 @@ User.hasMany(ForgotPasswordToken, { foreignKey: "user_id" })
 Session.belongsTo(User, { foreignKey: "user_id" })
 User.hasMany(Session, { foreignKey: "user_id" })
 
+OTP.belongsTo(User, { foreignKey: "user_id" })
+User.hasMany(OTP, { foreignKey: "user_id" })
+
 module.exports = {
   sequelize,
   Post,
@@ -51,5 +55,6 @@ module.exports = {
   Like,
   VerificationToken,
   ForgotPasswordToken,
-  Session
+  Session,
+  OTP
 }

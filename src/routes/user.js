@@ -1,6 +1,8 @@
 const router = require("express").Router();
-const DAO = require("../lib/dao");
-const { User, Post } = require("../lib/sequelize");
+// const DAO = require("../lib/dao");
+// const { User, Post } = require("../lib/sequelize");
+
+const User = require("../lib/mongodb/users")
 
 // router.get("/", async (req, res) => {
 //   try {
@@ -19,17 +21,50 @@ const { User, Post } = require("../lib/sequelize");
 //   }
 // })
 
-router.get("/", async (req, res) => {
+// router.get("/", async (req, res) => {
+//   try {
+//     const userDAO = new DAO(User)
+
+//     const findUsers = await userDAO.findAndCountAll(req.query)
+
+//     return res.status(200).json({
+//       message: "Find users",
+//       result: findUsers
+//     })
+//   } catch (err) {
+//     return res.status(500).json({
+//       message: "Server error"
+//     })
+//   }
+// })
+
+router.post("/mongo", async (req, res) => {
   try {
-    const userDAO = new DAO(User)
+    const newUser = await User.create(req.body);
 
-    const findUsers = await userDAO.findAndCountAll(req.query)
+    res.status(201).send("Success")
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      message: "Server error"
+    })
+  }
+})
 
-    return res.status(200).json({
-      message: "Find users",
+router.get("/mongo", async (req, res) => {
+  try {
+    const findUsers = await User
+      .find({ ...req.query })
+      .skip(req.query._limitPerPage * req.query._page)
+      .limit(req.query._limit)
+
+    res.status(200).json({
+      message: "Success",
       result: findUsers
     })
+
   } catch (err) {
+    console.log(err)
     return res.status(500).json({
       message: "Server error"
     })

@@ -5,7 +5,7 @@ const fs = require("fs")
 const { authorizedLoggedInUser, authorizeUserWithRole, sessionAuthorizeLoggedInUser } = require("../middlewares/authMiddleware")
 
 router.get("/",
-  sessionAuthorizeLoggedInUser,
+  // sessionAuthorizeLoggedInUser,
   async (req, res) => {
     try {
       const { _limit = 30, _page = 1, _sortBy = "", _sortDir = "" } = req.query

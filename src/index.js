@@ -9,6 +9,11 @@ const PORT = process.env.PORT
 const { sequelize } = require("./lib/sequelize")
 sequelize.sync({ alter: true })
 
+// const { connectMongoDB } = require("./lib/mongodb")
+// connectMongoDB().then(() => {
+//   console.log("Mongo DB Connected")
+// })
+
 const app = express();
 
 app.use(cors());

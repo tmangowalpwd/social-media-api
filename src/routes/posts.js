@@ -57,7 +57,7 @@ router.get("/",
   })
 
 router.post("/",
-  authorizedLoggedInUser,
+  sessionAuthorizeLoggedInUser,
   fileUploader({
     destinationFolder: "posts",
     fileType: "image",

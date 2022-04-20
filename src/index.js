@@ -27,7 +27,15 @@ app.get("/", (req, res) => {
   res.send("<h1>Pict perfect API</h1>")
 })
 
-const { postRoutes, authRoutes, userRoutes } = require("./routes")
+app.get("/products/:id", (req, res) => {
+  console.log("MASUK ID ", req.params.id)
+})
+
+app.get("/products/categories", (req, res) => {
+  console.log("CATEGORIES")
+})
+
+const { postRoutes, authRoutes, userRoutes, productRoutes } = require("./routes")
 
 app.use("/post_images", express.static(`${__dirname}/public/posts`))
 app.use("/profile_pictures", express.static(`${__dirname}/public/profile_pictures`))
@@ -35,6 +43,7 @@ app.use("/profile_pictures", express.static(`${__dirname}/public/profile_picture
 app.use("/posts", postRoutes)
 app.use("/auth", authRoutes)
 app.use("/users", userRoutes)
+app.use("/products", productRoutes)
 
 app.listen(PORT, () => {
   console.log("Listening in port", PORT)

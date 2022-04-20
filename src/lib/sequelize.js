@@ -22,6 +22,7 @@ const VerificationToken = require("../models/verification_token")(sequelize);
 const ForgotPasswordToken = require("../models/forgot_password_token")(sequelize);
 const Session = require("../models/session")(sequelize);
 const OTP = require("../models/otp")(sequelize);
+const Product = require("../models/product")(sequelize);
 
 // Associations
 // 1 : M
@@ -56,5 +57,6 @@ module.exports = {
   VerificationToken,
   ForgotPasswordToken,
   Session,
-  OTP
+  OTP,
+  Product
 }

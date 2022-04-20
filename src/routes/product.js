@@ -27,5 +27,18 @@ router.get("/", async (req, res) => {
   }
 })
 
+router.get("/:id", async (req, res) => {
+  try {
+    const findProducts = await Product.findByPk(req.params.id);
+
+    return res.status(200).json({
+      message: "Success",
+      result: findProducts
+    })
+  } catch (err) {
+    return res.status(500).send("Error")
+  }
+})
+
 
 module.exports = router

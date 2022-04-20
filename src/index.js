@@ -27,14 +27,6 @@ app.get("/", (req, res) => {
   res.send("<h1>Pict perfect API</h1>")
 })
 
-app.get("/products/:id", (req, res) => {
-  console.log("MASUK ID ", req.params.id)
-})
-
-app.get("/products/categories", (req, res) => {
-  console.log("CATEGORIES")
-})
-
 const { postRoutes, authRoutes, userRoutes, productRoutes } = require("./routes")
 
 app.use("/post_images", express.static(`${__dirname}/public/posts`))
